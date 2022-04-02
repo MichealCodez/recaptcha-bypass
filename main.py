@@ -11,10 +11,10 @@ browser = webdriver.Chrome()
 
 
 #def captcha():
-delayTime = 2
-audioToTextDelay = 10
-byPassUrl = 'https://www.beverlygrovedentistry.com/contactus'
-googleIBMLink = 'https://speech-to-text-demo.ng.bluemix.net/'
+delay_time = 2
+audio_to_text_delay = 10
+website = 'https://www.beverlygrovedentistry.com/contactus'
+# text_to_speach = 'https://speech-to-text-demo.ng.bluemix.net'
 option = webdriver.ChromeOptions()
 option.add_argument('--disable-notifications')
 option.add_argument("--mute-audio")
@@ -47,7 +47,7 @@ def save_file(content, filename):
             handle.write(data)
 
 
-driver.get(byPassUrl)
+driver.get(website)
 driver.maximize_window()
 time.sleep(5)
 recaptcha = driver.find_element(By.XPATH, '//*[@id="recaptcha1"]')
@@ -56,32 +56,32 @@ recaptcha_click = recaptcha.find_element(By.TAG_NAME, 'iframe')
 time.sleep(1)
 recaptcha_click.click()
 time.sleep(2)
-allIframesLen = driver.find_elements(By.TAG_NAME, 'iframe')
+all_iframes_len = driver.find_elements(By.TAG_NAME, 'iframe')
 time.sleep(1)
-audioBtnFound = False
-audioBtnIndex = -1
-for index in range(len(allIframesLen)):
+audio_btn_found = False
+audio_btn_index = -1
+for index in range(len(all_iframes_len)):
     driver.switch_to.default_content()
     iframe = driver.find_elements(By.TAG_NAME, 'iframe')[index]
     driver.switch_to.frame(iframe)
-    driver.implicitly_wait(delayTime)
+    driver.implicitly_wait(delay_time)
     try:
-        audioBtn = driver.find_element(By.ID, 'recaptcha-audio-button') or \
+        audio_btn = driver.find_element(By.ID, 'recaptcha-audio-button') or \
                    driver.find_element(By.ID, 'recaptcha-anchor')
-        audioBtn.click()
-        audioBtnFound = True
-        audioBtnIndex = index
+        audio_btn.click()
+        audio_btn_found = True
+        audio_btn_index = index
         break
     except Exception as e:
         pass
-if audioBtnFound:
+if audio_btn_found:
     try:
         href = driver.find_element(By.ID, 'audio-source').get_attribute('src')
         audio_file = requests.get(href, stream=True)
         save_file(audio_file, "audio.mp3")
         audio_text = audio_to_text("C:/Users/hp specter/Desktop/Indianproj/audio.mp3")
         driver.switch_to.default_content()
-        iframe = driver.find_elements(By.TAG_NAME, 'iframe')[audioBtnIndex]
+        iframe = driver.find_elements(By.TAG_NAME, 'iframe')[audio_btn_index]
         driver.switch_to.frame(iframe)
         respond = driver.find_element(By.ID, 'audio-response')
         respond.send_keys(audio_text)
